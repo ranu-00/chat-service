@@ -13,5 +13,7 @@ public interface CustomerMessageDto {
 		public void updateSenderMobileNumber(Long chatMessageId,String senderMobileNumber);
 		public void updateSenderNameNumber(Long chatMessageId,String senderName);
 		public void updateSenderamount(Long chatMessageId,String amount);
+		public void delete(CustomerMessage chat);
+		
 
 }

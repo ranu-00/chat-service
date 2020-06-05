@@ -59,5 +59,13 @@ public class CustomerMessageDtoImpl implements CustomerMessageDto{
 		
 	}
 
+	@Override
+	@Transactional
+	public void delete(CustomerMessage chat) {
+		// TODO Auto-generated method stub
+		customerMessageRepo.delete(chat);
+		
+	}
+
 	
 }

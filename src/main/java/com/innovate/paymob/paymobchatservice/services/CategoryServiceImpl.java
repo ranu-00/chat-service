@@ -70,25 +70,27 @@ public class CategoryServiceImpl implements CategoryService{
 		 mobileNumber =whatsappMobileNumber;
 		 int chatMessageId = 0;
 			CustomerMessage customerMobile  = customerMessageDto.findBymobileNumber(whatsappMobileNumber);
-			 
-			if(customerMobile ==null) {
-				System.out.println(message);
-				if("2".equals(message.replaceAll("[^0-9]", ""))){
-					 // hit mayank service to respond customer 
-					ItemsResponse items =callBucketListMicroService("items");
-						Message
-		                .creator(new PhoneNumber("whatsapp:+91"+whatsappMobileNumber), // to
-		                        new PhoneNumber("whatsapp:+14155238886"), // from
-		                        items.getCategory().toString())
-		                .create();	
-				 }else if("3".equals(message.replaceAll("[^0-9]", ""))) {
-					 OfferResponse mess = callOffersMicroService(new Long("9898989898"));
-						Message
-		                .creator(new PhoneNumber("whatsapp:+91"+whatsappMobileNumber), // to
-		                        new PhoneNumber("whatsapp:+14155238886"), // from
-		                        mess.getOfferSummary())
-		                .create();	
-				 }else {
+			
+			if(customerMobile != null && customerMobile.getChatMessageId() ==0 &&  "2".equals(message.replaceAll("[^0-9]", ""))){
+				 // hit mayank service to respond customer 
+				ItemsResponse items =callBucketListMicroService("items");
+					Message
+	                .creator(new PhoneNumber("whatsapp:+91"+whatsappMobileNumber), // to
+	                        new PhoneNumber("whatsapp:+14155238886"), // from
+	                        items.getCategory().toString())
+	                .create();	
+			 }else if(customerMobile != null && customerMobile.getChatMessageId() ==0 &&  "3".equals(message.replaceAll("[^0-9]", ""))) {
+				 OfferResponse mess = callOffersMicroService(new Long("9898989898"));
+					Message
+	                .creator(new PhoneNumber("whatsapp:+91"+whatsappMobileNumber), // to
+	                        new PhoneNumber("whatsapp:+14155238886"), // from
+	                        mess.getOfferSummary())
+	                .create();	
+			 }else
+			
+			
+			if(customerMobile ==null) {		
+				
 			CustomerMessage model = new CustomerMessage();
 			model.setMessageCategoryId(1L);
 			model.setChatMessageId(0L);
@@ -99,16 +101,19 @@ public class CategoryServiceImpl implements CategoryService{
                        new PhoneNumber("whatsapp:+14155238886"), 
                        firstMessage)
                .create();
-				 }
+				 
 			}else {
 			
 			
 			if("1".equals(String.valueOf(customerMobile.getMessageCategoryId()))) {
 				 //money transfer chat started
+				
 				 CustomerMessage modelx = customerMessageDto.findByCatIdAndMobileNumber(1L, whatsappMobileNumber);
 				 long chatId = modelx.getChatMessageId();
+				 
 				 if(chatId == 0) {
 					 chatId++;
+					 System.out.println("we are here"+chatId );
 					 customerMessageDto.updateCustomerMessage(chatId, modelx.getMessageCategoryId(), modelx.getMobileNumber());
 				}else {
 									
@@ -134,7 +139,7 @@ public class CategoryServiceImpl implements CategoryService{
 					System.out.print(model.getMobileNumber() +" ==");
 					System.out.print(model.getSenderMobileNumber()+" ==");
 					System.out.println(model.getSenderName()+" ==");
-					customerMessageDto.updateCustomerMessage(0L, modelx.getMessageCategoryId(), modelx.getMobileNumber());
+					customerMessageDto.delete(model);
 					// RestClient Hit to rahul Service
 					TransferResponse mess = callSendMoneyMicroService(new Long(model.getMobileNumber()), new Long(model.getSenderMobileNumber()), Double.valueOf(3000));
 					Message
@@ -144,8 +149,7 @@ public class CategoryServiceImpl implements CategoryService{
 	                .create();
 					
 				}else {
-					ChatMessageModel chat= chatMessageDto.findBymessageId(chatId);
-					if(chat !=null)
+					ChatMessageModel chat= chatMessageDto.findBymessageId(chatId);					
 					Message
 			                .creator(new PhoneNumber("whatsapp:+91"+whatsappMobileNumber), // to
 			                        new PhoneNumber("whatsapp:+14155238886"), // from
